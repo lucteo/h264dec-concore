@@ -499,24 +499,31 @@ end:
 }
 
 void create_ed_rec_threads(H264Context *h){
+// CHANGE (concore): make it compile under macos; we don't have thread affinity
+#if !__APPLE__
     cpu_set_t cpuset;
+#endif
     int* aff;
 
     if (h->setaff ==1){
         for (int i=0; i<h->threads; i++){
             pthread_attr_init(&h->ed_rec_attr[i]);
+#if !__APPLE__
             CPU_ZERO(&cpuset);
             CPU_SET(i, &cpuset);
             pthread_attr_setaffinity_np(&h->ed_rec_attr[i], sizeof(cpu_set_t), &cpuset);
+#endif
             pthread_create(&h->ed_rec_thr[i], &h->ed_rec_attr[i], ed_rec_thread, h);
         }
     } else if (h->setaff ==2){
         aff = h->smt ? ed_rec_smt_aff : ed_rec_affinity ;
         for (int i=0; i<h->threads; i++){
             pthread_attr_init(&h->ed_rec_attr[i]);
+#if !__APPLE__
             CPU_ZERO(&cpuset);
             CPU_SET(aff[i], &cpuset);
             pthread_attr_setaffinity_np(&h->ed_rec_attr[i], sizeof(cpu_set_t), &cpuset);
+#endif
             pthread_create(&h->ed_rec_thr[i], &h->ed_rec_attr[i], ed_rec_thread, h);
         }
     } else {

@@ -4,7 +4,7 @@
 AC_PREREQ(2.61)
 AC_INIT([h264_mt], [0.1], [cchi@cs.tu-berlin.de])
 #AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([foreign])
 
 AC_CONFIG_SRCDIR([h264dec.c])
 AC_PROG_RANLIB
@@ -12,6 +12,7 @@ AC_PROG_RANLIB
 # Checks for programs.
 AC_GNU_SOURCE
 AC_PROG_CC
+AC_PROG_CXX
 AM_CONDITIONAL([HAVE_OMPSS], [test $CC = "sscc"])
 AC_DEFINE([OMPSS], [0], [Define to 1 on when using the OmpSs compiler sscc])
 if test $CC = "sscc";then

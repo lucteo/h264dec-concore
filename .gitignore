@@ -30,3 +30,19 @@
 *.exe
 *.out
 *.app
+
+# Build generated files
+build/
+Makefile.in
+aclocal.m4
+autom4te.cache*
+compile
+configure
+depcomp
+install-sh
+missing
+config.*
+
+# Sublime files
+*.sublime-project
+*.sublime-workspace
