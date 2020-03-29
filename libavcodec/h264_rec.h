@@ -28,10 +28,19 @@
 
 #include "h264_types.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 MBRecContext *get_mbrec_context(H264Context *h);
 void free_mbrec_context( MBRecContext *d);
 void h264_decode_mb_internal(MBRecContext *d, MBRecState *mrs, H264Slice *s, H264Mb *m);
 
 void init_mbrec_context(MBRecContext *mrc, MBRecState *mrs, H264Slice *s, int line);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

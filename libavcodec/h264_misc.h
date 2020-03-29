@@ -29,6 +29,11 @@
 #include "avcodec.h"
 #include "h264_types.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void start_timer(H264Context *h, int stage);
 void stop_timer(H264Context *h, int stage);
 
@@ -73,5 +78,9 @@ void free_SDL_context(SDLContext *sdlc);
 static inline int get_chroma_qp(H264Slice *s, int t, int qscale){
     return s->pps.chroma_qp_table[t][qscale];
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
