@@ -176,8 +176,14 @@ static inline void skip_bits_long(GetBitContext *s, int n){
  * @author BERO
  */
 static inline int get_xbits(GetBitContext *s, int n){
+    // CHANGE (concore): make it compile with C++11
+#ifdef __cplusplus
+    int sign;
+    int32_t cache;
+#else
     register int sign;
     register int32_t cache;
+#endif
     OPEN_READER(re, s)
     UPDATE_CACHE(re, s)
     cache = GET_CACHE(re,s);
@@ -188,7 +194,12 @@ static inline int get_xbits(GetBitContext *s, int n){
 }
 
 static inline int get_sbits(GetBitContext *s, int n){
+    // CHANGE (concore): make it compile with C++11
+#ifdef __cplusplus
+    int tmp;
+#else
     register int tmp;
+#endif
     OPEN_READER(re, s)
     UPDATE_CACHE(re, s)
     tmp= SHOW_SBITS(re, s, n);
@@ -202,7 +213,12 @@ static inline int get_sbits(GetBitContext *s, int n){
  * Note, the alt bitstream reader can read up to 25 bits, but the libmpeg2 reader can't
  */
 static inline unsigned int get_bits(GetBitContext *s, int n){
+    // CHANGE (concore): make it compile with C++11
+#ifdef __cplusplus
+    int tmp;
+#else
     register int tmp;
+#endif
     OPEN_READER(re, s)
     UPDATE_CACHE(re, s)
     tmp= SHOW_UBITS(re, s, n);
@@ -216,7 +232,12 @@ static inline unsigned int get_bits(GetBitContext *s, int n){
  * Note, the alt bitstream reader can read up to 25 bits, but the libmpeg2 reader can't
  */
 static inline unsigned int show_bits(GetBitContext *s, int n){
+    // CHANGE (concore): make it compile with C++11
+#ifdef __cplusplus
+    int tmp;
+#else
     register int tmp;
+#endif
     OPEN_READER(re, s)
     UPDATE_CACHE(re, s)
     tmp= SHOW_UBITS(re, s, n);

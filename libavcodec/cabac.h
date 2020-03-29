@@ -32,6 +32,11 @@
 #include "libavutil/x86_cpu.h"
 #include "libavutil/attributes.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CABAC_BITS 16
 #define CABAC_MASK ((1<<CABAC_BITS)-1)
 #define BRANCHLESS_CABAC_DECODER 1
@@ -202,5 +207,9 @@ static int av_unused get_cabac_terminate(CABACContext *c){
         return c->bytestream - c->bytestream_start;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* AVCODEC_CABAC_H */

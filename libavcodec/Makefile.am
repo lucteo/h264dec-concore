@@ -9,12 +9,15 @@ else
 if HAVE_OPENCL
 OPENCL_SOURCE= h264_opencl.c
 endif
-PTHREAD_SOURCE= h264_pthread.c
+# CHANGE (concore): also add concore-based implementation
+PTHREAD_SOURCE= h264_pthread.c h264_pthread_trace.cpp h264_concore.cpp
 SEQUENTIAL_SOURCE= h264_seq.c
 endif
 
 
 AM_CFLAGS = -std=gnu99 -Wall #-Werror
+# CHANGE (concore): use c++17
+AM_CXXFLAGS = -std=c++17 #-Wall #-Werror
 SUBDIRS = $(ARCH_SUBDIR) $(CELL_SUBDIR)
 lib_LIBRARIES = libavcodec.a
 

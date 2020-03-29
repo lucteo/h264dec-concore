@@ -24,6 +24,11 @@
 #include <stdarg.h>
 //#include "avutil.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Describes the class of an AVClass context structure. That is an
  * arbitrary struct of which the first field is a pointer to an
@@ -116,5 +121,9 @@ int av_log_get_level(void);
 void av_log_set_level(int);
 void av_log_set_callback(void (*)(int, const char*, va_list));
 void av_log_default_callback(int level, const char* fmt, va_list vl);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* AVUTIL_LOG_H */

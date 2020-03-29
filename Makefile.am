@@ -1,5 +1,6 @@
 AM_CFLAGS = -std=gnu99 -Wall #-Werror
-AM_LDFLAGS =
+# CHANGE (concore): add concore lib
+AM_LDFLAGS = -lconcore -lc++
 SUBDIRS = libavutil libavcodec
 bin_PROGRAMS = h264dec
 h264dec_SOURCES = h264dec.c

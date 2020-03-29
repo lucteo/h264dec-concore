@@ -52,6 +52,9 @@ static int parallel = 1;
 static int frame_width  = 0;
 static int frame_height = 0;
 
+// CHANGE (concore): add concore-based concurrent decoding
+static int concore = 0;
+
 static void av_exit(int ret)
 {
     //do some free calls
@@ -136,6 +139,7 @@ static void show_usage(void)
       "--slice-bufs <num> : number of slice buffers\n"
 #endif
       "-s       : non-threaded execution\n"
+      "-c       : concore-based concurrent execution\n"
       "-o       : raw output file\n"
       "-n <num> : number of frames\n"
       "-v       : verbose progress report\n"
@@ -161,6 +165,7 @@ static struct option long_options[] = {
     {"numframes", 1, 0, 'n'},
     {"use-ppe-ed", 1, 0, 'p'},
     {"sequential", 0, 0, 's'},
+    {"concore", 0, 0, 'c'}, // CHANGE (concore): add concore-based concurrent decoding
     {"threads", 1, 0, 't'},
     {"verbose", 1, 0, 'v'},
     {"wave-order", 1, 0, 'w'},
@@ -198,7 +203,8 @@ static void parse_cmd(int argc, char **argv)
     cli_opts.smt= 0;
     cli_opts.framerate= 0;
     cli_opts.framedelay= 0.1;
-    while ((c = getopt_long(argc, argv, "ade:fi:n:o:p:st:vwz:", long_options, &option_index)) != -1 ){
+    // CHANGE (concore): add concore-based concurrent decoding -- letter 'c'
+    while ((c = getopt_long(argc, argv, "ade:fi:n:o:p:sct:vwz:", long_options, &option_index)) != -1 ){
         int this_option_optind = optind ? optind : 1;
 
         switch (c){
@@ -261,6 +267,10 @@ static void parse_cmd(int argc, char **argv)
                 cli_opts.threads = 0;
                 parallel = 0;
                 break;
+            // CHANGE (concore): add concore-based concurrent decoding
+            case 'c':
+                concore = 1;
+                break;
             case 't':
                 cli_opts.threads = atoi(optarg);
                 if (cli_opts.threads<=0){
@@ -319,7 +329,12 @@ int main(int argc, char **argv)
     if (h264_decode_ompss( h ) < 0)
         av_exit(-1);
 #else
-    if (parallel){
+    // CHANGE (concore): add concore-based concurrent decoding
+    if (concore){
+        if (h264_decode_concore( h ) < 0)
+            av_exit(1);
+    }
+    else if (parallel){
         if (ARCH_CELL && !no_arch){
             if (h264_decode_cell( h ) < 0)
                 av_exit(-1);

@@ -28,8 +28,17 @@
 
 #include "h264_types.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void av_read_frame_internal(ParserContext *pc, GetBitContext *gb);
 ParserContext *get_parse_context(int ifile);
 void free_parse_context(ParserContext *pc);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

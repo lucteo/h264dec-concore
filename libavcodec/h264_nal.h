@@ -29,8 +29,17 @@
 #include "avcodec.h"
 #include "h264_types.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int decode_nal_units(NalContext *n, H264Slice *s, GetBitContext *gb);
 NalContext *get_nal_context(int width, int height);
 void free_nal_context(NalContext *nc);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

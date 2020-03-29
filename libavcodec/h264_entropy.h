@@ -27,6 +27,11 @@
 #include "h264_types.h"
 #include "cabac.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * decodes a CABAC coded macroblock
  * @return 0 if OK, AC_ERROR / DC_ERROR / MV_ERROR if an error is noticed
@@ -39,5 +44,9 @@ int init_entropy_buf(EntropyContext *ec, H264Slice *s, int line);
 EntropyContext * get_entropy_context(H264Context *h);
 void init_dequant_tables(H264Slice *s, EntropyContext *ec);
 void free_entropy_context(EntropyContext *ec);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

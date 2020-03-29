@@ -28,8 +28,17 @@
 
 #include "h264_types.h"
 
+// CHANGE (concore): make this usable from C++ code
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void ff_h264_pred_direct_motion_rec(MBRecContext *mrc, MBRecState *mrs, H264Slice *s, int *mb_type);
 int pred_motion_mb_rec(MBRecContext *mrc, MBRecState *mrs, H264Slice *s, H264Mb *m);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
