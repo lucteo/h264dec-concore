@@ -331,7 +331,7 @@ int main(int argc, char **argv)
 #else
     // CHANGE (concore): add concore-based concurrent decoding
     if (concore){
-        if (h264_decode_concore( h ) < 0)
+        if (h264_decode_concore_pipeline( h ) < 0)
             av_exit(1);
     }
     else if (parallel){

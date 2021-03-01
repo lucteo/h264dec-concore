@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Lucian Radu Teodorescu
+ * Copyright 2021 Lucian Radu Teodorescu
  *
  * Based on the existing Starbench code, by TU Berlin
  *
@@ -302,8 +302,10 @@ void DecFrameContext::gen_output() {
 
 void DecFrameContext::start_line_if_stopped(int line_idx, bool until_end) {
     int old = mb_lines[line_idx].start_state.exchange(until_end ? 2 : 1);
-    if (old == 0)
-        concore::global_executor_high_prio([=]() { decode_slice_mb_line(line_idx); });
+    if (old == 0) {
+        concore::global_executor ex(concore::global_executor::prio_high);
+        concore::execute(ex, [=]() { decode_slice_mb_line(line_idx); });
+    }
 }
 bool DecFrameContext::try_stop_line(int line_idx) {
     CONCORE_PROFILING_FUNCTION();
@@ -326,7 +328,7 @@ TaskGraph::TaskGraph(GlobalDecContext* global_data, int num_par_frames) {
     // Create and initialize all the tasks
     // We will create tasks for all the stages for all the lines
     tasks.reserve(static_cast<size_t>(num_par_frames * num_stages));
-    auto& e = concore::global_executor;
+    concore::global_executor e;
     for (int i = 0; i < num_par_frames; i++) {
         auto& frm = frame_ctxs[i];
 
@@ -336,11 +338,11 @@ TaskGraph::TaskGraph(GlobalDecContext* global_data, int num_par_frames) {
         auto fun_dec_mb_done = []() {};
         auto fun_out = [this, &frm]() { frm.gen_output(); };
 
-        tasks.emplace_back(concore::chained_task({{fun_parse, group}, e}));
-        tasks.emplace_back(concore::chained_task({{fun_dec_ent, group}, e}));
-        tasks.emplace_back(concore::chained_task({{fun_dec_mb, group}, e}));
-        tasks.emplace_back(concore::chained_task({{fun_dec_mb_done, group}, e}));
-        tasks.emplace_back(concore::chained_task({{fun_out, group}, e}));
+        tasks.emplace_back(concore::chained_task({fun_parse, group}, e));
+        tasks.emplace_back(concore::chained_task({fun_dec_ent, group}, e));
+        tasks.emplace_back(concore::chained_task({fun_dec_mb, group}, e));
+        tasks.emplace_back(concore::chained_task({fun_dec_mb_done, group}, e));
+        tasks.emplace_back(concore::chained_task({fun_out, group}, e));
 
         frm.mb_dec_done_task = &task(i, 3);
     }

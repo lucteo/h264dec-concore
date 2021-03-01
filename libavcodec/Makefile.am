@@ -10,7 +10,7 @@ if HAVE_OPENCL
 OPENCL_SOURCE= h264_opencl.c
 endif
 # CHANGE (concore): also add concore-based implementation
-PTHREAD_SOURCE= h264_pthread.c h264_pthread_trace.cpp h264_concore.cpp
+PTHREAD_SOURCE= h264_pthread.c h264_pthread_trace.cpp h264_concore.cpp h264_concore_pipeline.cpp
 SEQUENTIAL_SOURCE= h264_seq.c
 endif
 
