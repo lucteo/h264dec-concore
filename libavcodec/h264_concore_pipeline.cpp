@@ -51,7 +51,6 @@ struct atomic_int : std::atomic<int> {
 
 struct process_matrix {
     using cell_fun_t = std::function<void(int x, int y)>;
-    using done_fun_t = std::function<void()>;
 
     void start(int w, int h, cell_fun_t cf, concore::task&& donet) {
         width = w;
@@ -110,7 +109,6 @@ struct FrameData {
     H264Mb* mbs{nullptr};                             // entropy, mb
     std::vector<MBRecContext*> mb_line_dec_ctx;       // the decoding context for a MB line
     process_matrix mb_processing;                     // matrix of MB chunks to process
-    concore::task mb_dec_done;                        // task that marks the end of the mb_dec
     int frame_idx{0};                                 // the current frame index
 
     explicit FrameData(H264Context* h);
@@ -271,14 +269,6 @@ void stage_decode_slice_mb(DecFrame& frm) {
     if (!frm.frame_data)
         return;
 
-    // This will be broken into multiple tasks.
-    // Create a task that will get the continuation of this task, to unlock the pipeline
-    auto* cur_task = concore::task::current_task();
-    assert(cur_task != nullptr);
-    frm.frame_data->mb_dec_done =
-            concore::task{[] {}, cur_task->get_task_group(), cur_task->get_continuation()};
-    cur_task->set_continuation({});
-
     auto& fd = *frm.frame_data;
 
     H264Slice *s = &fd.slice;
@@ -301,11 +291,16 @@ void stage_decode_slice_mb(DecFrame& frm) {
     get_dpb_entry(h, s);
 
     if (!h->no_mbd) {
+        // This will be broken into multiple tasks. Exchange continuation.
+        auto cont = concore::exchange_cur_continuation();
+        auto grp = concore::task_group::current_task_group();
+        concore::task end_task{[] {}, grp, std::move(cont)};
+
         auto chunk_fun = [&frm] (int x, int y) {
             decode_slice_mb_chunk(frm.global_ctx, *frm.frame_data, x, y);
         };
         int width = h->mb_width/mb_line_chunk_size;
-        fd.mb_processing.start(width, h->mb_height, chunk_fun, std::move(fd.mb_dec_done));
+        fd.mb_processing.start(width, h->mb_height, chunk_fun, std::move(end_task));
     }
 }
 
