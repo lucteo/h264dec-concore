@@ -70,6 +70,7 @@ int h264_decode_seq(H264Context *h);
 
 // CHANGE (concore): add concore-based concurrent decoding
 int h264_decode_concore(H264Context *h);
+int h264_decode_concore_pipeline(H264Context *h);
 
 
 H264Context *get_h264dec_context(const char *file_name, int ifile, int ofile, int frame_width, int frame_height, h264_options *opts);
